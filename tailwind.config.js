@@ -1,14 +1,16 @@
 /** @type {import('tailwindcss/tailwind-config').TailwindConfig} */
 const TailwindConfig = {
-	content: ['./pages/**/*.{js,ts,jsx,tsx}', './components/**/*.{js,ts,jsx,tsx}'],
+	content: [
+		'./pages/**/*.{js,ts,jsx,tsx}',
+		'./components/**/*.{js,ts,jsx,tsx}',
+	],
 	theme: {
 		extend: {},
 	},
-	plugins: [],
-	corePlugins: {
-		preflight: false,
-	},
-	important: '#__next',
+	plugins: [
+		require('@tailwindcss/typography'),
+		require('@tailwindcss/forms'),
+	],
 }
 
 module.exports = TailwindConfig
