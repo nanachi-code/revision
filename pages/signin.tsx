@@ -1,66 +1,111 @@
 import type { InferGetServerSidePropsType, NextPage } from 'next'
 import { useState } from 'react'
-import TextInput from '../components/TextInput'
-import Button from '../components/Button'
-import { getCsrfToken, signIn } from 'next-auth/react'
+import { getCsrfToken, signIn, SignInResponse } from 'next-auth/react'
 import type { GetServerSideProps } from 'next'
+import Layout from '../components/Layout'
+import Link from 'next/link'
+import { Alert, Button, Label, Spinner, TextInput } from 'flowbite-react'
+import { useRouter } from 'next/router'
+import classNames from 'classnames'
 
-const SignIn: NextPage = ({
-	csrfToken,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const SignIn: NextPage = ({ csrfToken }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
 	const [email, setEmail] = useState('')
 	const [password, setPassword] = useState('')
+	const [errorMessage, setErrorMessage] = useState('')
+	const [loading, setLoading] = useState(false)
+	const router = useRouter()
+
+	const formSubmitHandler: React.FormEventHandler<HTMLFormElement> = async (e) => {
+		e.preventDefault()
+		setLoading(true)
+
+		const res = await signIn<'credentials'>('credentials', {
+			email,
+			password,
+			redirect: false,
+		})
+
+		if (res) {
+			const { ok, error } = res
+			if (ok) return router.push('/')
+
+			switch (error) {
+				case 'CredentialsSignin':
+					setErrorMessage('Invalid email or password')
+					break
+
+				default:
+					setErrorMessage('An unknown error occurred')
+					break
+			}
+			setLoading(false)
+		}
+	}
 
 	return (
-		<div className="flex items-center justify-center">
-			<form
-				onSubmit={() =>
-					signIn('credentials', {
-						email,
-						password,
-						callbackUrl: '/my-subject',
-					})
-				}
-				className="w-1/3"
-			>
-				<h1 className="text-3xl mb-3">Sign in</h1>
+		<Layout>
+			<div className="flex items-center justify-center">
+				<form onSubmit={formSubmitHandler} className="w-1/3 flex flex-col gap-4">
+					<div className="text-center">
+						<h2 className="text-xl mb-3">Sign in</h2>
+					</div>
 
-				<input
-					name="csrfToken"
-					type="hidden"
-					defaultValue={csrfToken}
-				/>
-
-				<TextInput
-					id="email-input"
-					className="rounded block w-full"
-					label="Email"
-					placeholder="Email"
-					value={email}
-					type="email"
-					onChange={(e) => setEmail(e.target.value)}
-					required
-				/>
-				<TextInput
-					id="password-input"
-					className="rounded block w-full"
-					placeholder="Password"
-					label="Password"
-					value={password}
-					type="password"
-					onChange={(e) => setPassword(e.target.value)}
-					required
-				/>
-				<div className="flex justify-center">
-					<Button
-						className="bg-sky-500 hover:bg-sky-700 px-9"
-						type="submit"
+					<div
+						className={classNames({
+							hidden: !errorMessage,
+						})}
 					>
-						Sign in
-					</Button>
-				</div>
-			</form>
-		</div>
+						<Alert color="red">
+							<span className="font-medium">{errorMessage}</span>
+						</Alert>
+					</div>
+
+					<input name="csrfToken" type="hidden" defaultValue={csrfToken} />
+
+					<div>
+						<Label className="mb-2 block" htmlFor="email">
+							Email
+						</Label>
+						<TextInput
+							id="email"
+							placeholder="Email"
+							value={email}
+							type="email"
+							onChange={(e) => setEmail(e.target.value)}
+							required
+						/>
+					</div>
+
+					<div>
+						<Label className="mb-2 block" htmlFor="password">
+							Password
+						</Label>
+						<TextInput
+							id="password"
+							placeholder="Password"
+							value={password}
+							type="password"
+							onChange={(e) => setPassword(e.target.value)}
+							required
+						/>
+					</div>
+
+					<div className="text-center">
+						<Button className="mx-auto" color="blue" outline type="submit" disabled={loading}>
+							{loading ?? <Spinner aria-label="Sign in" />}
+							Sign in
+						</Button>
+
+						<div>
+							No account?{' '}
+							<Link href="/signup" passHref>
+								<a className="text-blue-700 underline">Sign up</a>
+							</Link>
+						</div>
+					</div>
+				</form>
+			</div>
+		</Layout>
 	)
 }
 

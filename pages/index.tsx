@@ -1,11 +1,12 @@
-import type { NextPage } from 'next'
-import { signIn } from 'next-auth/react'
+import type { NextPage } from 'next/types'
+import LoggedInLayout from '../components/LoggedInLayout'
+import SubjectList from '../components/SubjectList'
 
 const Home: NextPage = () => {
 	return (
-		<>
-			<button onClick={() => signIn('credentials')}>sign in</button>
-		</>
+		<LoggedInLayout>
+			<SubjectList />
+		</LoggedInLayout>
 	)
 }
 

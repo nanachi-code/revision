@@ -19,16 +19,27 @@ export default NextAuth({
 			async authorize(credentials, _) {
 				if (!credentials || !credentials.email || !credentials.password) return null
 
-				const user = await prisma.user.findUnique({
-					where: {
-						email: credentials.email,
-					},
-				})
+				try {
+					const user = await prisma.user.findUnique({
+						where: {
+							email: credentials.email,
+						},
+					})
 
-				if (!user || !(await compare(credentials.password, user.password))) return null
+					console.log(user)
 
-				return user
+					if (!user || !(await compare(credentials.password, user.password))) return null
+
+					return { id: user.id, email: user.email }
+				} catch (e) {
+					console.log(e)
+
+					return null
+				}
 			},
 		}),
 	],
+	pages: {
+		signIn: '/signin',
+	},
 })
