@@ -5,7 +5,7 @@ import type { GetServerSideProps } from 'next'
 import Layout from '../components/Layout'
 import Link from 'next/link'
 import { Label, TextInput, Button } from 'flowbite-react'
-import { ApiSignupResponse } from './api/auth/signup'
+import { ApiSignupResponse } from '../types/api/auth'
 
 const SignUp: NextPage = ({ csrfToken }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
 	const [email, setEmail] = useState('')
