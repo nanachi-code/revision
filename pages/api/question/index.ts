@@ -11,8 +11,6 @@ const handler: NextApiHandler<ApiGetQuestionsResponse | ApiCreateQuestionRespons
 	}
 
 	if (req.method == 'GET') {
-		console.log(req.query)
-
 		const questions = await prisma.question.findMany({
 			where: {
 				topicId: req.query.topicId as string,

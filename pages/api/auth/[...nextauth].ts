@@ -26,8 +26,6 @@ export default NextAuth({
 						},
 					})
 
-					console.log(user)
-
 					if (!user || !(await compare(credentials.password, user.password))) return null
 
 					return { id: user.id, email: user.email }

@@ -23,8 +23,6 @@ const handler: NextApiHandler<ApiGetTopicsResponse | ApiCreateTopicResponse> = a
 			topics,
 		})
 	} else if (req.method == 'POST') {
-		console.log(req.body)
-
 		const topic = await prisma.topic.create({
 			data: {
 				text: req.body.text,

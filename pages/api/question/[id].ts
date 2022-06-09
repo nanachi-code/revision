@@ -38,8 +38,6 @@ const handler: NextApiHandler<ApiDeleteQuestionResponse | ApiGetQuestionResponse
 			ok: question ? true : false,
 		})
 	} else if (req.method == 'PATCH') {
-		console.log(req.body);
-
 		const question = await prisma.question.update({
 			where: {
 				id: req.query.id as string,
