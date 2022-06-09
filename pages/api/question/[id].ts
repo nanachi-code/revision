@@ -2,12 +2,12 @@ import type { NextApiHandler } from 'next'
 import { getSession } from 'next-auth/react'
 import { prisma } from '../../../lib/prisma'
 import type {
-	ApiDeleteSubjectResponse,
-	ApiEditSubjectResponse,
-	ApiGetSubjectResponse,
-} from '../../../types/api/subject'
+	ApiDeleteQuestionResponse,
+	ApiEditQuestionResponse,
+	ApiGetQuestionResponse,
+} from '../../../types/api/question'
 
-const handler: NextApiHandler<ApiDeleteSubjectResponse | ApiGetSubjectResponse | ApiEditSubjectResponse> = async (
+const handler: NextApiHandler<ApiDeleteQuestionResponse | ApiGetQuestionResponse | ApiEditQuestionResponse> = async (
 	req,
 	res
 ) => {
@@ -18,44 +18,40 @@ const handler: NextApiHandler<ApiDeleteSubjectResponse | ApiGetSubjectResponse |
 	}
 
 	if (req.method == 'GET') {
-		const subject = await prisma.subject.findUnique({
+		const question = await prisma.question.findUnique({
 			where: {
 				id: req.query.id as string,
-			},
-			include: {
-				_count: {
-					select: {
-						topics: true,
-					},
-				},
 			},
 		})
 
 		return res.status(200).json({
-			subject,
+			question,
 		})
 	} else if (req.method == 'DELETE') {
-		const subject = await prisma.subject.delete({
+		const question = await prisma.question.delete({
 			where: {
 				id: req.query.id as string,
 			},
 		})
 
 		return res.status(200).json({
-			ok: subject ? true : false,
+			ok: question ? true : false,
 		})
 	} else if (req.method == 'PATCH') {
-		const subject = await prisma.subject.update({
+		console.log(req.body);
+
+		const question = await prisma.question.update({
 			where: {
 				id: req.query.id as string,
 			},
 			data: {
-				title: req.body.newTitle,
+				text: req.body.newText,
+				answer: req.body.newAnswer,
 			},
 		})
 
 		return res.status(200).json({
-			ok: subject ? true : false,
+			ok: question ? true : false,
 		})
 	}
 }

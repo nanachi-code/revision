@@ -1,10 +1,7 @@
 import { hash } from 'bcrypt'
 import type { NextApiHandler } from 'next'
 import { prisma } from '../../../lib/prisma'
-
-export interface ApiSignupResponse {
-	ok?: boolean
-}
+import type { ApiSignupResponse } from '../../../types/api/auth'
 
 const handler: NextApiHandler<ApiSignupResponse> = async (req, res) => {
 	const user = await prisma.user.create({

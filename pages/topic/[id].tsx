@@ -1,52 +1,54 @@
-import { Pagination, Button, Modal, Label, TextInput } from 'flowbite-react'
+import { Modal, Label, TextInput, Button, Pagination } from 'flowbite-react'
 import type { NextPage } from 'next'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useState, useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import ErrorAlert from '../../components/ErrorAlert'
 import LoggedInLayout from '../../components/LoggedInLayout'
-import TopicList from '../../components/TopicList'
-import { useSubject, useTopics } from '../../lib/hooks/fetcher'
-import { ApiCreateTopicResponse } from '../../types/api/topic'
+import QuestionList from '../../components/QuestionList'
+import { useQuestions, useTopic } from '../../lib/hooks/fetcher'
+import { ApiCreateQuestionResponse } from '../../types/api/question'
 
 const SubjectPage: NextPage = () => {
 	const router = useRouter()
 	const id = router.query.id as string
 	const {
-		subject,
-		isLoading: isSubjectLoading,
-		isError: isSubjectError,
-		// reload: reloadSubject,
-	} = useSubject(id)
-	const [topicPage, setTopicPage] = useState(1)
+		topic,
+		isLoading: isTopicLoading,
+		isError: isTopicError,
+		// reload: reloadTopic,
+	} = useTopic(id)
+	const [questionPage, setQuestionPage] = useState(1)
 	const {
-		topics,
-		isLoading: isTopicsLoading,
-		isError: isTopicsError,
-		reload: reloadTopics,
-	} = useTopics(id, topicPage)
-	const totalTopicPages = useMemo(() => (subject ? Math.ceil(subject._count.topics / 10) : 0), [subject])
+		questions,
+		isLoading: isQuestionsLoading,
+		isError: isQuestionsError,
+		reload: reloadQuestions,
+	} = useQuestions(id, questionPage)
+	const totalQuestionPages = useMemo(() => (topic ? Math.ceil(topic._count.questions / 10) : 0), [topic])
 	const [errorMessage, setErrorMessage] = useState('')
 	const [modalVisible, setModalVisibility] = useState(false)
 	const [text, setText] = useState('')
+	const [answer, setAnswer] = useState('')
 
-	if (isSubjectError || isTopicsError) setErrorMessage('An unknown error occured')
+	if (isTopicError || isQuestionsError) setErrorMessage('An unknown error occured')
 
 	const createHandler: React.FormEventHandler<HTMLFormElement> = async (e) => {
 		e.preventDefault()
 
-		const res = await fetch('/api/topic', {
+		const res = await fetch('/api/question', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 			},
 			body: JSON.stringify({
 				text,
-				subjectId: id,
+				answer,
+				topicId: id,
 			}),
 		})
 
-		const data: ApiCreateTopicResponse = await res.json()
+		const data: ApiCreateQuestionResponse = await res.json()
 		if (data.ok) {
 			setErrorMessage('')
 		} else {
@@ -55,42 +57,44 @@ const SubjectPage: NextPage = () => {
 
 		setModalVisibility(false)
 		setText('')
-		reloadTopics()
+		setAnswer('')
+		reloadQuestions()
 	}
 
 	const cancelHandler: React.MouseEventHandler<HTMLButtonElement> = () => {
 		setText('')
+		setAnswer('')
 		setModalVisibility(false)
 	}
 
 	return (
 		<LoggedInLayout>
 			<div className="mt-5">
-				<Link href="/" passHref>
+				<Link href={`/subject/${topic?.subjectId}`} passHref>
 					<a className="text-blue-700 underline text-sm">Go back</a>
 				</Link>
 
-				<h2 className="text-2xl">Subject: {isSubjectLoading ? 'Loading...' : subject?.title}</h2>
+				<h2 className="text-2xl">Topic: {isTopicLoading ? 'Loading...' : topic?.text}</h2>
 
 				<ErrorAlert errorMessage={errorMessage} />
 
 				<Pagination
-					currentPage={topicPage}
-					totalPages={totalTopicPages}
-					onPageChange={(p) => setTopicPage(p)}
+					currentPage={questionPage}
+					totalPages={totalQuestionPages}
+					onPageChange={(p) => setQuestionPage(p)}
 				/>
 
 				<div className="mt-3">
 					<Button color="blue" outline={true} onClick={() => setModalVisibility(true)}>
-						Create a new topic
+						Create a new question
 					</Button>
 				</div>
 
-				<TopicList {...{ topics, reloadTopics, isLoading: isTopicsLoading, setErrorMessage }} />
+				<QuestionList {...{ questions, isLoading: isQuestionsLoading, setErrorMessage, reloadQuestions }} />
 
 				<Modal show={modalVisible} onClose={() => setModalVisibility(false)} size="md">
 					<form onSubmit={createHandler}>
-						<Modal.Header>Create a new topic</Modal.Header>
+						<Modal.Header>Create a new question</Modal.Header>
 						<Modal.Body>
 							<div className="flex flex-col gap-4">
 								<div>
@@ -102,6 +106,19 @@ const SubjectPage: NextPage = () => {
 										placeholder="Text"
 										value={text}
 										onChange={(e) => setText(e.target.value)}
+										required
+									/>
+								</div>
+
+								<div>
+									<Label className="mb-2 block" htmlFor="title">
+										Answer
+									</Label>
+									<TextInput
+										id="answer"
+										placeholder="Answer"
+										value={answer}
+										onChange={(e) => setAnswer(e.target.value)}
 										required
 									/>
 								</div>

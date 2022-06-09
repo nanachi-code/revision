@@ -1,12 +1,12 @@
 import type { InferGetServerSidePropsType, NextPage } from 'next'
 import { useState } from 'react'
-import { getCsrfToken, signIn, SignInResponse } from 'next-auth/react'
+import { getCsrfToken, signIn } from 'next-auth/react'
 import type { GetServerSideProps } from 'next'
 import Layout from '../components/Layout'
 import Link from 'next/link'
-import { Alert, Button, Label, Spinner, TextInput } from 'flowbite-react'
+import { Button, Label, Spinner, TextInput } from 'flowbite-react'
 import { useRouter } from 'next/router'
-import classNames from 'classnames'
+import ErrorAlert from '../components/ErrorAlert'
 
 const SignIn: NextPage = ({ csrfToken }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
 	const [email, setEmail] = useState('')
@@ -50,15 +50,7 @@ const SignIn: NextPage = ({ csrfToken }: InferGetServerSidePropsType<typeof getS
 						<h2 className="text-xl mb-3">Sign in</h2>
 					</div>
 
-					<div
-						className={classNames({
-							hidden: !errorMessage,
-						})}
-					>
-						<Alert color="red">
-							<span className="font-medium">{errorMessage}</span>
-						</Alert>
-					</div>
+					<ErrorAlert errorMessage={errorMessage} />
 
 					<input name="csrfToken" type="hidden" defaultValue={csrfToken} />
 

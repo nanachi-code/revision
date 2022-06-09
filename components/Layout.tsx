@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 interface LayoutProps {
 	children: React.ReactNode
 }
@@ -6,7 +8,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 	return (
 		<>
 			<div className="text-center">
-				<h1 className="text-6xl mb-5 font-bold">Revision</h1>
+				<Link href="/" passHref>
+					<a>
+						<h1 className="text-6xl mb-5 font-bold">Revision</h1>
+					</a>
+				</Link>
 				<p>
 					This app helps you memorize things better using a method called{' '}
 					<a
