@@ -1,18 +1,20 @@
-import type { InferGetServerSidePropsType, NextPage } from 'next'
-import { useState } from 'react'
+import { Button, Label, Spinner, TextInput } from 'flowbite-react'
+import type { GetServerSideProps, InferGetServerSidePropsType, NextPage } from 'next'
 import { getCsrfToken, signIn } from 'next-auth/react'
-import type { GetServerSideProps } from 'next'
-import Layout from '../components/Layout'
 import Link from 'next/link'
-import { Label, TextInput, Button } from 'flowbite-react'
-import { ApiSignupResponse } from '../types/api/auth'
+import { useState } from 'react'
+import Layout from '../components/Layout'
+import type { ApiSignupResponse } from '../types/api/auth'
 
 const SignUp: NextPage = ({ csrfToken }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
 	const [email, setEmail] = useState('')
 	const [password, setPassword] = useState('')
+	const [loading, setLoading] = useState(false)
 
 	const formSubmitHandler: React.FormEventHandler<HTMLFormElement> = async (e) => {
 		e.preventDefault()
+		setLoading(true)
+
 		const res = await fetch('/api/auth/signup', {
 			method: 'POST',
 			headers: {
@@ -25,12 +27,15 @@ const SignUp: NextPage = ({ csrfToken }: InferGetServerSidePropsType<typeof getS
 			}),
 		})
 		const data: ApiSignupResponse = await res.json()
-		if (data.ok)
+		if (data.ok) {
 			signIn('credentials', {
 				email,
 				password,
 				callbackUrl: '/',
 			})
+		} else {
+			setLoading(false)
+		}
 	}
 
 	return (
@@ -73,7 +78,7 @@ const SignUp: NextPage = ({ csrfToken }: InferGetServerSidePropsType<typeof getS
 
 					<div className="text-center">
 						<Button color="blue" outline className="mx-auto" type="submit">
-							Sign up
+							{loading ? <Spinner aria-label="Sign up" /> : 'Sign up'}
 						</Button>
 
 						<div>

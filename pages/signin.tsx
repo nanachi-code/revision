@@ -84,8 +84,7 @@ const SignIn: NextPage = ({ csrfToken }: InferGetServerSidePropsType<typeof getS
 
 					<div className="text-center">
 						<Button className="mx-auto" color="blue" outline type="submit" disabled={loading}>
-							{loading ?? <Spinner aria-label="Sign in" />}
-							Sign in
+							{loading ? <Spinner aria-label="Sign in" /> : 'Sign in'}
 						</Button>
 
 						<div>
