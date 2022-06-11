@@ -2,24 +2,25 @@ import Layout from './Layout'
 import { signOut, useSession } from 'next-auth/react'
 
 interface LoggedInLayoutProps {
-	children?: React.ReactNode
+	title?: string
+	children: React.ReactNode
 }
 
-const LoggedInLayout: React.FC<LoggedInLayoutProps> = ({ children }) => {
+const LoggedInLayout: React.FC<LoggedInLayoutProps> = ({ children, title }) => {
 	const { data: session, status } = useSession({
 		required: true,
 	})
 
 	if (status === 'loading') {
 		return (
-			<Layout>
+			<Layout {...{ title }}>
 				<div className="text-center">Loading...</div>
 			</Layout>
 		)
 	}
 
 	return (
-		<Layout>
+		<Layout {...{ title }}>
 			<div className="text-center">
 				Signed in as {session?.user?.email}{' '}
 				<button className="text-blue-700 underline" onClick={() => signOut()}>

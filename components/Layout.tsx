@@ -1,12 +1,17 @@
+import Head from 'next/head'
 import Link from 'next/link'
 
 interface LayoutProps {
+	title?: string
 	children: React.ReactNode
 }
 
-const Layout: React.FC<LayoutProps> = ({ children }) => {
+const Layout: React.FC<LayoutProps> = ({ children, title }) => {
 	return (
 		<>
+			<Head>
+				<title>{title}</title>
+			</Head>
 			<div className="text-center">
 				<Link href="/" passHref>
 					<a>

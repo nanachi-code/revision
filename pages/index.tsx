@@ -48,7 +48,7 @@ const Home: NextPage = () => {
 	if (isError) setErrorMessage('An unknown error occured')
 
 	return (
-		<LoggedInLayout>
+		<LoggedInLayout title='My subjects'>
 			<div className="mt-5">
 				<h2 className="text-2xl">My subjects</h2>
 

@@ -68,7 +68,7 @@ const SubjectPage: NextPage = () => {
 	}
 
 	return (
-		<LoggedInLayout>
+		<LoggedInLayout title='Topic'>
 			<div className="mt-5">
 				<Link href={`/subject/${topic?.subjectId}`} passHref>
 					<a className="text-blue-700 underline text-sm">Go back</a>
