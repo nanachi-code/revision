@@ -12,12 +12,12 @@ const SignIn: NextPage = ({ csrfToken }: InferGetServerSidePropsType<typeof getS
 	const [email, setEmail] = useState('')
 	const [password, setPassword] = useState('')
 	const [errorMessage, setErrorMessage] = useState('')
-	const [loading, setLoading] = useState(false)
+	const [isLoading, setIsLoading] = useState(false)
 	const router = useRouter()
 
 	const formSubmitHandler: React.FormEventHandler<HTMLFormElement> = async (e) => {
 		e.preventDefault()
-		setLoading(true)
+		setIsLoading(true)
 
 		const res = await signIn<'credentials'>('credentials', {
 			email,
@@ -38,7 +38,7 @@ const SignIn: NextPage = ({ csrfToken }: InferGetServerSidePropsType<typeof getS
 					setErrorMessage('An unknown error occurred')
 					break
 			}
-			setLoading(false)
+			setIsLoading(false)
 		}
 	}
 
@@ -83,8 +83,8 @@ const SignIn: NextPage = ({ csrfToken }: InferGetServerSidePropsType<typeof getS
 					</div>
 
 					<div className="text-center">
-						<Button className="mx-auto" color="blue" outline type="submit" disabled={loading}>
-							{loading ? <Spinner aria-label="Sign in" /> : 'Sign in'}
+						<Button className="mx-auto" color="blue" outline type="submit" disabled={isLoading}>
+							{isLoading ? <Spinner aria-label="Sign in" /> : 'Sign in'}
 						</Button>
 
 						<div>

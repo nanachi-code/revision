@@ -6,9 +6,16 @@ interface TopicCardListProps {
 	setErrorMessage: React.Dispatch<React.SetStateAction<string>>
 	isLoading: boolean
 	reloadTopics: () => void
+	reloadSubject: () => void
 }
 
-const TopicList: React.FC<TopicCardListProps> = ({ topics, setErrorMessage, reloadTopics, isLoading }) => {
+const TopicList: React.FC<TopicCardListProps> = ({
+	isLoading,
+	topics,
+	setErrorMessage,
+	reloadTopics,
+	reloadSubject,
+}) => {
 	if (isLoading) {
 		return <div className="mt-3">Loading...</div>
 	}
@@ -18,7 +25,9 @@ const TopicList: React.FC<TopicCardListProps> = ({ topics, setErrorMessage, relo
 			{!topics || !topics.length ? (
 				<p>No topics found. </p>
 			) : (
-				topics.map(({ text, id }) => <TopicCard key={id} {...{ id, text, setErrorMessage, reloadTopics }} />)
+				topics.map(({ text, id }) => (
+					<TopicCard key={id} {...{ id, text, setErrorMessage, reloadTopics, reloadSubject }} />
+				))
 			)}
 		</ul>
 	)

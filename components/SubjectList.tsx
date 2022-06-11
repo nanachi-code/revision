@@ -12,7 +12,7 @@ const SubjectList: React.FC<SubjectListProps> = ({ subjects, setErrorMessage, re
 	if (isLoading) return <div className="mt-3">Loading...</div>
 
 	return (
-		<ul className="mt-3 grid-cols-3 grid gap-4">
+		<ul className="mt-3 sm:grid-cols-3 grid gap-4 grid-cols-1">
 			{!subjects || !subjects.length ? (
 				<p>No subjects found. </p>
 			) : (

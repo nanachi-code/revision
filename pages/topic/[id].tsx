@@ -1,4 +1,5 @@
-import { Modal, Label, TextInput, Button, Pagination } from 'flowbite-react'
+import classNames from 'classnames'
+import { Modal, Label, TextInput, Button, Pagination, Textarea, Spinner } from 'flowbite-react'
 import type { NextPage } from 'next'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -12,12 +13,7 @@ import { ApiCreateQuestionResponse } from '../../types/api/question'
 const SubjectPage: NextPage = () => {
 	const router = useRouter()
 	const id = router.query.id as string
-	const {
-		topic,
-		isLoading: isTopicLoading,
-		isError: isTopicError,
-		// reload: reloadTopic,
-	} = useTopic(id)
+	const { topic, isLoading: isTopicLoading, isError: isTopicError, reload: reloadTopic } = useTopic(id)
 	const [questionPage, setQuestionPage] = useState(1)
 	const {
 		questions,
@@ -30,11 +26,16 @@ const SubjectPage: NextPage = () => {
 	const [modalVisible, setModalVisibility] = useState(false)
 	const [text, setText] = useState('')
 	const [answer, setAnswer] = useState('')
+	const [isWaitingForResponse, setIsWaitingForResponse] = useState(false)
 
 	if (isTopicError || isQuestionsError) setErrorMessage('An unknown error occured')
 
 	const createHandler: React.FormEventHandler<HTMLFormElement> = async (e) => {
 		e.preventDefault()
+
+		if (isWaitingForResponse) return
+
+		setIsWaitingForResponse(true)
 
 		const res = await fetch('/api/question', {
 			method: 'POST',
@@ -59,6 +60,8 @@ const SubjectPage: NextPage = () => {
 		setText('')
 		setAnswer('')
 		reloadQuestions()
+		reloadTopic()
+		setIsWaitingForResponse(false)
 	}
 
 	const cancelHandler: React.MouseEventHandler<HTMLButtonElement> = () => {
@@ -68,7 +71,7 @@ const SubjectPage: NextPage = () => {
 	}
 
 	return (
-		<LoggedInLayout title='Topic'>
+		<LoggedInLayout title="Topic">
 			<div className="mt-5">
 				<Link href={`/subject/${topic?.subjectId}`} passHref>
 					<a className="text-blue-700 underline text-sm">Go back</a>
@@ -82,6 +85,9 @@ const SubjectPage: NextPage = () => {
 					currentPage={questionPage}
 					totalPages={totalQuestionPages}
 					onPageChange={(p) => setQuestionPage(p)}
+					className={classNames({
+						hidden: totalQuestionPages <= 1,
+					})}
 				/>
 
 				<div className="mt-3">
@@ -90,7 +96,9 @@ const SubjectPage: NextPage = () => {
 					</Button>
 				</div>
 
-				<QuestionList {...{ questions, isLoading: isQuestionsLoading, setErrorMessage, reloadQuestions }} />
+				<QuestionList
+					{...{ questions, isLoading: isQuestionsLoading, setErrorMessage, reloadQuestions, reloadTopic }}
+				/>
 
 				<Modal show={modalVisible} onClose={() => setModalVisibility(false)} size="md">
 					<form onSubmit={createHandler}>
@@ -114,19 +122,22 @@ const SubjectPage: NextPage = () => {
 									<Label className="mb-2 block" htmlFor="title">
 										Answer
 									</Label>
-									<TextInput
+									<Textarea
 										id="answer"
 										placeholder="Answer"
 										value={answer}
 										onChange={(e) => setAnswer(e.target.value)}
+										rows={4}
 										required
 									/>
 								</div>
 							</div>
 						</Modal.Body>
 						<Modal.Footer>
-							<Button type="submit">Create</Button>
-							<Button type="button" onClick={cancelHandler}>
+							<Button type="submit" disabled={isWaitingForResponse}>
+								{isWaitingForResponse ? <Spinner /> : 'Create'}
+							</Button>
+							<Button type="button" color="light" onClick={cancelHandler} disabled={isWaitingForResponse}>
 								Cancel
 							</Button>
 						</Modal.Footer>

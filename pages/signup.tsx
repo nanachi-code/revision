@@ -9,11 +9,11 @@ import type { ApiSignupResponse } from '../types/api/auth'
 const SignUp: NextPage = ({ csrfToken }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
 	const [email, setEmail] = useState('')
 	const [password, setPassword] = useState('')
-	const [loading, setLoading] = useState(false)
+	const [isLoading, setIsLoading] = useState(false)
 
 	const formSubmitHandler: React.FormEventHandler<HTMLFormElement> = async (e) => {
 		e.preventDefault()
-		setLoading(true)
+		setIsLoading(true)
 
 		const res = await fetch('/api/auth/signup', {
 			method: 'POST',
@@ -34,7 +34,7 @@ const SignUp: NextPage = ({ csrfToken }: InferGetServerSidePropsType<typeof getS
 				callbackUrl: '/',
 			})
 		} else {
-			setLoading(false)
+			setIsLoading(false)
 		}
 	}
 
@@ -78,7 +78,7 @@ const SignUp: NextPage = ({ csrfToken }: InferGetServerSidePropsType<typeof getS
 
 					<div className="text-center">
 						<Button color="blue" outline className="mx-auto" type="submit">
-							{loading ? <Spinner aria-label="Sign up" /> : 'Sign up'}
+							{isLoading ? <Spinner aria-label="Sign up" /> : 'Sign up'}
 						</Button>
 
 						<div>

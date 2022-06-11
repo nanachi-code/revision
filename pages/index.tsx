@@ -1,4 +1,5 @@
-import { Button, Label, Modal, Pagination, TextInput } from 'flowbite-react'
+import classNames from 'classnames'
+import { Button, Label, Modal, Pagination, Spinner, TextInput } from 'flowbite-react'
 import type { NextPage } from 'next/types'
 import { useState, useMemo } from 'react'
 import ErrorAlert from '../components/ErrorAlert'
@@ -14,9 +15,14 @@ const Home: NextPage = () => {
 	const [modalVisible, setModalVisibility] = useState(false)
 	const [errorMessage, setErrorMessage] = useState('')
 	const [title, setTitle] = useState('')
+	const [isWaitingForResponse, setIsWaitingForResponse] = useState(false)
 
-	const createSubjectHandler: React.FormEventHandler<HTMLFormElement> = async (e) => {
+	const createHandler: React.FormEventHandler<HTMLFormElement> = async (e) => {
 		e.preventDefault()
+
+		if (isWaitingForResponse) return
+
+		setIsWaitingForResponse(true)
 
 		const res = await fetch('/api/subject', {
 			method: 'POST',
@@ -38,9 +44,10 @@ const Home: NextPage = () => {
 		setModalVisibility(false)
 		setTitle('')
 		reloadSubjects()
+		setIsWaitingForResponse(false)
 	}
 
-	const cancelCreateSubjectHandler: React.MouseEventHandler<HTMLButtonElement> = () => {
+	const cancelHandler: React.MouseEventHandler<HTMLButtonElement> = () => {
 		setTitle('')
 		setModalVisibility(false)
 	}
@@ -48,7 +55,7 @@ const Home: NextPage = () => {
 	if (isError) setErrorMessage('An unknown error occured')
 
 	return (
-		<LoggedInLayout title='My subjects'>
+		<LoggedInLayout title="My subjects">
 			<div className="mt-5">
 				<h2 className="text-2xl">My subjects</h2>
 
@@ -60,12 +67,19 @@ const Home: NextPage = () => {
 					</Button>
 				</div>
 
-				<Pagination currentPage={page} totalPages={totalPages} onPageChange={(p) => setPage(p)} />
+				<Pagination
+					currentPage={page}
+					totalPages={totalPages}
+					onPageChange={(p) => setPage(p)}
+					className={classNames({
+						hidden: totalPages <= 1,
+					})}
+				/>
 
 				<SubjectList {...{ subjects, setErrorMessage, reloadSubjects, isLoading }} />
 
 				<Modal show={modalVisible} onClose={() => setModalVisibility(false)} size="md">
-					<form onSubmit={createSubjectHandler}>
+					<form onSubmit={createHandler}>
 						<Modal.Header>Create a new subject</Modal.Header>
 						<Modal.Body>
 							<div className="flex flex-col gap-4">
@@ -84,8 +98,10 @@ const Home: NextPage = () => {
 							</div>
 						</Modal.Body>
 						<Modal.Footer>
-							<Button type="submit">Create</Button>
-							<Button type="button" onClick={cancelCreateSubjectHandler}>
+							<Button type="submit" disabled={isWaitingForResponse}>
+								{isWaitingForResponse ? <Spinner /> : 'Create'}
+							</Button>
+							<Button type="button" color="light" onClick={cancelHandler} disabled={isWaitingForResponse}>
 								Cancel
 							</Button>
 						</Modal.Footer>

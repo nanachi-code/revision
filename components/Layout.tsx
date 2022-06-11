@@ -29,7 +29,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title }) => {
 					.
 				</p>
 			</div>
-			<div className="container px-3">
+			<div className="px-3 pb-5">
 				<div className="mt-5">{children}</div>
 			</div>
 		</>

@@ -11,9 +11,17 @@ interface QuestionCardProps {
 	answer: string
 	setErrorMessage: React.Dispatch<React.SetStateAction<string>>
 	reloadQuestions: () => void
+	reloadTopic: () => void
 }
 
-const QuestionCard: React.FC<QuestionCardProps> = ({ id, text, answer, setErrorMessage, reloadQuestions }) => {
+const QuestionCard: React.FC<QuestionCardProps> = ({
+	id,
+	text,
+	answer,
+	setErrorMessage,
+	reloadQuestions,
+	reloadTopic,
+}) => {
 	const [newText, setNewText] = useState(text)
 	const [isEditing, setIsEditing] = useState(false)
 	const [newAnswer, setNewAnswer] = useState(answer)
@@ -32,6 +40,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ id, text, answer, setErrorM
 		}
 
 		reloadQuestions()
+		reloadTopic()
 	}
 
 	const confirmEditHandler: React.MouseEventHandler<HTMLButtonElement> = async (_) => {
@@ -101,7 +110,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ id, text, answer, setErrorM
 
 				<div>
 					<Label className="mb-2">Answer</Label>
-					<Textarea value={newAnswer} onChange={(e) => setNewAnswer(e.target.value)} required />
+					<Textarea value={newAnswer} onChange={(e) => setNewAnswer(e.target.value)} rows={4} required />
 				</div>
 			</div>
 

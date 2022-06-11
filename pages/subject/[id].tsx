@@ -1,4 +1,5 @@
-import { Pagination, Button, Modal, Label, TextInput } from 'flowbite-react'
+import classNames from 'classnames'
+import { Pagination, Button, Modal, Label, TextInput, Spinner } from 'flowbite-react'
 import type { NextPage } from 'next'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -12,12 +13,7 @@ import { ApiCreateTopicResponse } from '../../types/api/topic'
 const SubjectPage: NextPage = () => {
 	const router = useRouter()
 	const id = router.query.id as string
-	const {
-		subject,
-		isLoading: isSubjectLoading,
-		isError: isSubjectError,
-		// reload: reloadSubject,
-	} = useSubject(id)
+	const { subject, isLoading: isSubjectLoading, isError: isSubjectError, reload: reloadSubject } = useSubject(id)
 	const [topicPage, setTopicPage] = useState(1)
 	const {
 		topics,
@@ -29,11 +25,16 @@ const SubjectPage: NextPage = () => {
 	const [errorMessage, setErrorMessage] = useState('')
 	const [modalVisible, setModalVisibility] = useState(false)
 	const [text, setText] = useState('')
+	const [isWaitingForResponse, setIsWaitingForResponse] = useState(false)
 
 	if (isSubjectError || isTopicsError) setErrorMessage('An unknown error occured')
 
 	const createHandler: React.FormEventHandler<HTMLFormElement> = async (e) => {
 		e.preventDefault()
+
+		if (isWaitingForResponse) return
+
+		setIsWaitingForResponse(true)
 
 		const res = await fetch('/api/topic', {
 			method: 'POST',
@@ -56,6 +57,8 @@ const SubjectPage: NextPage = () => {
 		setModalVisibility(false)
 		setText('')
 		reloadTopics()
+		reloadSubject()
+		setIsWaitingForResponse(false)
 	}
 
 	const cancelHandler: React.MouseEventHandler<HTMLButtonElement> = () => {
@@ -64,7 +67,7 @@ const SubjectPage: NextPage = () => {
 	}
 
 	return (
-		<LoggedInLayout title='Subject'>
+		<LoggedInLayout title="Subject">
 			<div className="mt-5">
 				<Link href="/" passHref>
 					<a className="text-blue-700 underline text-sm">Go back</a>
@@ -78,6 +81,9 @@ const SubjectPage: NextPage = () => {
 					currentPage={topicPage}
 					totalPages={totalTopicPages}
 					onPageChange={(p) => setTopicPage(p)}
+					className={classNames({
+						hidden: totalTopicPages <= 1,
+					})}
 				/>
 
 				<div className="mt-3">
@@ -86,7 +92,7 @@ const SubjectPage: NextPage = () => {
 					</Button>
 				</div>
 
-				<TopicList {...{ topics, reloadTopics, isLoading: isTopicsLoading, setErrorMessage }} />
+				<TopicList {...{ topics, reloadTopics, reloadSubject, isLoading: isTopicsLoading, setErrorMessage }} />
 
 				<Modal show={modalVisible} onClose={() => setModalVisibility(false)} size="md">
 					<form onSubmit={createHandler}>
@@ -108,8 +114,10 @@ const SubjectPage: NextPage = () => {
 							</div>
 						</Modal.Body>
 						<Modal.Footer>
-							<Button type="submit">Create</Button>
-							<Button type="button" onClick={cancelHandler}>
+							<Button type="submit" disabled={isWaitingForResponse}>
+								{isWaitingForResponse ? <Spinner /> : 'Create'}
+							</Button>
+							<Button type="button" color="light" onClick={cancelHandler} disabled={isWaitingForResponse}>
 								Cancel
 							</Button>
 						</Modal.Footer>

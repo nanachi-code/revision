@@ -10,9 +10,10 @@ interface TopicCardProps {
 	text: string
 	setErrorMessage: React.Dispatch<React.SetStateAction<string>>
 	reloadTopics: () => void
+	reloadSubject: () => void
 }
 
-const TopicCard: React.FC<TopicCardProps> = ({ id, text, setErrorMessage, reloadTopics }) => {
+const TopicCard: React.FC<TopicCardProps> = ({ id, text, setErrorMessage, reloadTopics, reloadSubject }) => {
 	const [newText, setNewText] = useState(text)
 	const [isEditing, setIsEditing] = useState(false)
 
@@ -29,6 +30,7 @@ const TopicCard: React.FC<TopicCardProps> = ({ id, text, setErrorMessage, reload
 		}
 
 		reloadTopics()
+		reloadSubject()
 	}
 
 	const confirmEditHandler: React.MouseEventHandler<HTMLButtonElement> = async (_) => {
