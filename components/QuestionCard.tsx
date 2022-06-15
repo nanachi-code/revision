@@ -3,6 +3,7 @@ import classNames from 'classnames'
 import { TextInput, Button, Textarea, Label } from 'flowbite-react'
 import Link from 'next/link'
 import { useState } from 'react'
+import { replaceNewlineWithBr } from '../lib/helper'
 import { ApiDeleteQuestionResponse, ApiEditQuestionResponse } from '../types/api/question'
 
 interface QuestionCardProps {
@@ -93,9 +94,8 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
 					className={classNames({
 						hidden: !isViewingAnswer,
 					})}
-				>
-					Answer: {answer}
-				</div>
+					dangerouslySetInnerHTML={{ __html: replaceNewlineWithBr(answer) }}
+				></div>
 			</div>
 
 			<div
