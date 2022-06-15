@@ -31,15 +31,29 @@ const handler: NextApiHandler<ApiDeleteTopicResponse | ApiGetTopicResponse | Api
 			topic,
 		})
 	} else if (req.method == 'DELETE') {
-		const topic = await prisma.topic.delete({
-			where: {
-				id: req.query.id as string,
-			},
-		})
+		try {
+			await prisma.question.deleteMany({
+				where: {
+					topicId: req.query.id as string,
+				},
+			})
 
-		return res.status(200).json({
-			ok: topic ? true : false,
-		})
+			await prisma.topic.delete({
+				where: {
+					id: req.query.id as string,
+				},
+			})
+
+			return res.status(200).json({
+				ok: true,
+			})
+		} catch (error) {
+			console.log(error)
+
+			return res.status(200).json({
+				ok: false,
+			})
+		}
 	} else if (req.method == 'PATCH') {
 		const topic = await prisma.topic.update({
 			where: {

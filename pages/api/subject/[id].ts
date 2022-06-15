@@ -35,15 +35,46 @@ const handler: NextApiHandler<ApiDeleteSubjectResponse | ApiGetSubjectResponse |
 			subject,
 		})
 	} else if (req.method == 'DELETE') {
-		const subject = await prisma.subject.delete({
-			where: {
-				id: req.query.id as string,
-			},
-		})
+		try {
+			const topicIds = await prisma.topic.findMany({
+				where: {
+					subjectId: req.query.id as string,
+				},
+				select: {
+					id: true,
+				},
+			})
 
-		return res.status(200).json({
-			ok: subject ? true : false,
-		})
+			await prisma.question.deleteMany({
+				where: {
+					topicId: {
+						in: topicIds.map((topic) => topic.id),
+					},
+				},
+			})
+
+			await prisma.topic.deleteMany({
+				where: {
+					subjectId: req.query.id as string,
+				},
+			})
+
+			await prisma.subject.delete({
+				where: {
+					id: req.query.id as string,
+				},
+			})
+
+			return res.status(200).json({
+				ok: true,
+			})
+		} catch (error) {
+			console.log(error)
+
+			return res.status(200).json({
+				ok: false,
+			})
+		}
 	} else if (req.method == 'PATCH') {
 		const subject = await prisma.subject.update({
 			where: {
