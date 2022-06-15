@@ -18,6 +18,11 @@ const handler: NextApiHandler<ApiDeleteSubjectResponse | ApiGetSubjectResponse |
 	}
 
 	if (req.method == 'GET') {
+		if (req.query.id == 'undefined')
+			return res.status(200).json({
+				message: 'UNDEFINED',
+			})
+
 		const subject = await prisma.subject.findUnique({
 			where: {
 				id: req.query.id as string,

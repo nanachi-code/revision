@@ -14,6 +14,11 @@ const handler: NextApiHandler<ApiDeleteTopicResponse | ApiGetTopicResponse | Api
 	}
 
 	if (req.method == 'GET') {
+		if (req.query.id == 'undefined')
+			return res.status(200).json({
+				message: "UNDEFINED",
+			})
+
 		const topic = await prisma.topic.findUnique({
 			where: {
 				id: req.query.id as string,

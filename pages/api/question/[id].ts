@@ -17,17 +17,7 @@ const handler: NextApiHandler<ApiDeleteQuestionResponse | ApiGetQuestionResponse
 		return res.status(401).json({ message: 'Unauthorized' })
 	}
 
-	if (req.method == 'GET') {
-		const question = await prisma.question.findUnique({
-			where: {
-				id: req.query.id as string,
-			},
-		})
-
-		return res.status(200).json({
-			question,
-		})
-	} else if (req.method == 'DELETE') {
+	if (req.method == 'DELETE') {
 		const question = await prisma.question.delete({
 			where: {
 				id: req.query.id as string,
